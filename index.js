@@ -56,12 +56,35 @@ async function run() {
 
     // appointments
 
+    app.get('/appointments', async(req,res) => {
+      console.log(req.query);
+      let query = {}
+      if(req.query?.email){
+        query = {email: req.query.email}
+      }
+
+      const result = await appointmentCollection.find(query).toArray()
+      res.send(result)
+    })
+
     app.post('/appointments', async (req, res) => {
       const appointments = req.body;
 
       const result = await appointmentCollection.insertOne(appointments);
       res.send(result);
     });
+
+    app.put('/appointments/:id', async(req, res) => {
+      const updatedBooking = req.body
+      
+    })
+
+    app.delete('/appointments/:id', async(req, res) => {
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await appointmentCollection.deleteOne(query)
+      res.send(result)
+    })
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log('Pinged your deployment. You successfully connected to MongoDB!');
