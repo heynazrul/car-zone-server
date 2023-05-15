@@ -56,16 +56,16 @@ async function run() {
 
     // appointments
 
-    app.get('/appointments', async(req,res) => {
+    app.get('/appointments', async (req, res) => {
       console.log(req.query);
-      let query = {}
-      if(req.query?.email){
-        query = {email: req.query.email}
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
       }
 
-      const result = await appointmentCollection.find(query).toArray()
-      res.send(result)
-    })
+      const result = await appointmentCollection.find(query).toArray();
+      res.send(result);
+    });
 
     app.post('/appointments', async (req, res) => {
       const appointments = req.body;
@@ -74,17 +74,28 @@ async function run() {
       res.send(result);
     });
 
-    app.put('/appointments/:id', async(req, res) => {
-      const updatedBooking = req.body
-      
-    })
+    app.patch('/appointments/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedBooking = req.body;
+      // console.log(updatedBooking);
 
-    app.delete('/appointments/:id', async(req, res) => {
-      const id = req.params.id
-      const query = {_id: new ObjectId(id)}
-      const result = await appointmentCollection.deleteOne(query)
-      res.send(result)
-    })
+      const updateDoc = {
+        $set: {
+          status: updatedBooking.status,
+        },
+      };
+
+      const result = await appointmentCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.delete('/appointments/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await appointmentCollection.deleteOne(query);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log('Pinged your deployment. You successfully connected to MongoDB!');
